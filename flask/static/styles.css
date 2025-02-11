@@ -1,0 +1,54 @@
+body {
+	font-family: Arial,sans-serif;
+	background-color: #e7dcbc;
+	color: #333;
+	line-height: 1.6;
+	padding: 20px;
+}
+
+h1 {
+	color: #4A4A4A;
+	margin-bottom: 1%;
+	margin-top: 1%;
+	font-size: 700%;
+	font-weight: normal;
+}
+
+input[text="text"],
+textarea {
+	width: 100%;
+
+}
+
+form {
+	padding-block: 2%;
+}
+
+.button-1 {
+	padding: 3%;
+	font-size: 150%;
+	border-radius: 10%;
+	font-family: Arial, sans-serif;
+}
+
+.file-input {
+	padding-block: 5%;
+	font-size: 120%;
+	font-family: Arial, sans-serif;
+}
+
+.container {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	flex-direction: column;
+	align-items: center;
+}
+
+.padding-5 {
+	padding:5%;
+}
+
+.padding-3 {
+	padding:3%;
+}
