@@ -21,13 +21,13 @@
 		<div class="padding-3"></div>
 
 		<upload class="container">
-			<form class="container" method="post" action="/submit">
-				<input class="file-input" type="file">
+			<form class="container" method="post" action="/file" enctype="multipart/form-data">
+				<input class="file-input" type="file" name="file" required>
 				<div class="padding-3"></div>
 				<button class="button-1" type="submit">Upload File</button>
 			</form>
-			<form class="container" method="post" action="/submit">
-				<textarea rows="3" cols="50" placeholder="Enter Text Here"></textarea>
+			<form class="container" method="post" action="/text" enctype="multipart/form-data">
+				<textarea rows="3" cols="50" name="text" placeholder="Enter Text Here" required></textarea>
 				<div class="padding-5"></div>
 				<button class="button-1" type="submit">Upload Text</button>
 			</form>
