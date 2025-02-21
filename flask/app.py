@@ -1,17 +1,28 @@
-from flask import Flask, flash, request, redirect, render_template, send_from_directory, url_for
+from flask import Flask, flash, request, redirect, render_template, send_from_directory, url_for, jsonify
+from flask_pymongo import PyMongo
+from gridfs import GridFS
 from werkzeug.utils import secure_filename
 import os, random
 import numpy as np
+from datetime import datetime
+from bson import ObjectId
+from io import BytesIO
 
 app = Flask(__name__)
 
-UPLOAD_FOLDER=os.environ.get('UPLOAD_FOLDER', '../uploads')
+#default values
+#UPLOAD_FOLDER='../uploads'
 BANNED_EXTENSIONS='htm' #everything containing htm
-FILENAME_LENGTH=os.environ.get('FILENAME_LENGTH', 4)
+FILENAME_LENGTH=4
+MONGO_CONN="mongodb://mongo:27017/fsharer"
 
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['BANNED_EXTENSIONS'] = BANNED_EXTENSIONS
-app.config['FILENAME_LENGTH'] = FILENAME_LENGTH
+#app.config['UPLOAD_FOLDER'] = os.environ.get('UPLOAD_FOLDER', UPLOAD_FOLDER)
+app.config['BANNED_EXTENSIONS'] = os.environ.get('BANNED_EXTENSIONS', BANNED_EXTENSIONS)
+app.config['FILENAME_LENGTH'] = os.environ.get('FILENAME_LENGTH', FILENAME_LENGTH)
+app.config['MONGO_URI'] = os.environ.get("MONGO_CONN", MONGO_CONN)
+
+mongo = PyMongo(app)
+mongofs = GridFS(mongo.db)
 
 def get_random_string():
     length = app.config['FILENAME_LENGTH']
@@ -48,8 +59,22 @@ def submit_file():
         if app.config['BANNED_EXTENSIONS'] in extension:
             extension = ".txt" #replace XSS vuln with generic extension
 
-        filename = secure_filename(get_random_string() + extension)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        attempts = 0
+
+        #attempt to give the file a random name. Keep retrying if duplicate key, with a limit
+        while attempts < 10:
+            rand = get_random_string()
+            filename = secure_filename(rand + extension)
+
+            #Use mongodb instead
+            try:
+                file_id = mongofs.put(file, filename=filename, _id=rand time=datetime.utcnow())
+                attempts = 10
+            except DuplicateKeyError:
+                attempts += 1
+                pass
+
+            #file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
         link = make_link(request.base_url, filename)
 
@@ -67,9 +92,20 @@ def submit_text():
             flash("No text provided")
             return redirect(request.url)
 
-        filename = secure_filename(get_random_string() + ".txt")
-        with open(os.path.join(app.config['UPLOAD_FOLDER'], filename), "w") as file:
-            file.write(text)
+        #try to get random name and save to mongodb
+        attempts = 0
+        while attempts < 10:
+            rand = get_random_string()
+            filename = secure_filename(rand + ".txt")
+
+            try:
+                file_id = mongofs.put(file, filename=filename, _id=rand, time=datetime.utcnow())
+                attempts = 10
+            except DuplicateKeyError:
+                attempts += 1
+                pass
+        #with open(os.path.join(app.config['UPLOAD_FOLDER'], filename), "w") as file:
+        #    file.write(text)
 
         link = make_link(request.base_url, filename)
 
@@ -77,9 +113,11 @@ def submit_text():
 
 @app.route("/uploads/<filename>")
 def uploaded_file(filename):
-    if app.config['BANNED_EXTENSIONS'] in filename:
+    if "." + app.config['BANNED_EXTENSIONS'] in filename:
         return "<h1>403 Forbidden</h1>", 403
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    file = fs.get(filename.rsplit(".", 1)[0])
+    return send_file(BytesIO(file.read(), attachment_filename=file.filename, as_attachment=True))
+    #return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
 if __name__ == '__main__':
     app.run(debug=True)

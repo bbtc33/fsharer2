@@ -1,7 +1,7 @@
 services:
 
   db:
-    image: mysql:latest
+    image: mongo:latest
     restart: unless-stopped
 
     environment:
@@ -11,8 +11,16 @@ services:
       MYSQL_PASSWORD: securepassword
 
     ports:
-      - 3306:3306
+      - 27017:27017
 
     volumes:
-      - ./mysql_data:/var/lib/mysql
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db:/data/db
+
+    fsharer:
+      build: .
+      restart: unless-stopped
+      depends_on:
+        - mongo
+      ports:
+        - 5000:5000
+      environment:
