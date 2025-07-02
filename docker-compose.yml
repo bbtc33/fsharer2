@@ -1,3 +1,9 @@
+networks:
+  internal:
+    internal: true
+
+  public:
+
 services:
 
   db:
@@ -5,10 +11,9 @@ services:
     restart: unless-stopped
 
     environment:
-      MYSQL_ROOT_PASSWORD: supersecurepassword
-      MYSQL_DATABASE: files
-      MYSQL_USER: user
-      MYSQL_PASSWORD: securepassword
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: supersecurepassword
+      MONGO_INITDB_DATABASE: fsharer
 
     ports:
       - 27017:27017
@@ -16,11 +21,18 @@ services:
     volumes:
       - ./db:/data/db
 
-    fsharer:
-      build: .
-      restart: unless-stopped
-      depends_on:
-        - mongo
-      ports:
-        - 5000:5000
-      environment:
+    networks:
+      - internal
+
+  fsharer:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - 8000:8000
+    environment:
+      MONGO_CONN: "mongodb://root:supersecurepassword@db:27017/fsharer?authSource=admin"
+    networks:
+      - public
+      - internal

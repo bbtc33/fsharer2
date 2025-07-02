@@ -23,6 +23,9 @@
 		<div class="container">
 			<h2> Your Link: </h2>
 			<a href = "{{link}}">{{link}}</a>
+			<div class="padding-1"></div>
+			<img src="data:image/png;base64, {{ qrcode }}">
+			<div class="padding-1"></div>
 			<form action="/">
 				<button class="button-1" type="submit">Upload New</button>
 			</form>

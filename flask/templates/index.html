@@ -24,13 +24,20 @@
 			<form class="container" method="post" action="/file" enctype="multipart/form-data">
 				<input class="file-input" type="file" name="file" required>
 				<div class="padding-3"></div>
-				<button class="button-1" type="submit">Upload File</button>
+				<button class="button-1" type="submit" onclick="changeButton()">Upload File</button>
 			</form>
 			<form class="container" method="post" action="/text" enctype="multipart/form-data">
 				<textarea rows="3" cols="50" name="text" placeholder="Enter Text Here" required></textarea>
 				<div class="padding-5"></div>
-				<button class="button-1" type="submit">Upload Text</button>
+				<button class="button-1" type="submit" onclick="changeButton()">Upload Text</button>
 			</form>
 		</upload>
+		<script>
+			function changeButton() {
+				let button = document.getElementById("button-1");
+				button.innerText = "Please Wait ...;
+				button.disabled = true;
+			}
+		</script>
 	</body>
 </html>
