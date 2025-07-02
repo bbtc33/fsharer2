@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<title>fsharer</title>
+		<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+	</head>
+	<body>
+		<logo>
+			<h1>fsharer</h1>
+			<p>simple temporary filesharing</p>
+			<ul>
+				<li>Files are limited to 500 MB</li>
+				<li>Files will be deleted after 12 hours</li>
+				<li>Do not upload any illegal content</li>
+			</ul>
+		</logo>
+
+		<div class="padding-3"></div>
+
+		<h2> Error: {{ Error }} </h2>
+
+		</body>
+</html>

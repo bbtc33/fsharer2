@@ -1,0 +1,8 @@
+flask
+pymongo
+dnspython
+flask-pymongo
+numpy
+gunicorn
+qrcode[pil]
+apscheduler
