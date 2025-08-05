@@ -2,6 +2,7 @@ from flask import Flask, flash, request, redirect, render_template, send_file, u
 from flask_pymongo import PyMongo
 from gridfs import GridFS, GridFSBucket
 from werkzeug.utils import secure_filename
+from werkzeug.exceptions import RequestEntityTooLarge
 import os, random, io, qrcode, base64
 import numpy as np
 from datetime import datetime, timedelta
@@ -17,11 +18,13 @@ app = Flask(__name__)
 BANNED_EXTENSIONS='htm' #everything containing htm
 FILENAME_LENGTH=4
 MONGO_CONN="mongodb://mongo:27017/fsharer"
+MAX_CONTENT_LENGHT= 512 * 1024 * 1024  #512MB
 
 #app.config['UPLOAD_FOLDER'] = os.environ.get('UPLOAD_FOLDER', UPLOAD_FOLDER)
 app.config['BANNED_EXTENSIONS'] = os.environ.get('BANNED_EXTENSIONS', BANNED_EXTENSIONS)
 app.config['FILENAME_LENGTH'] = os.environ.get('FILENAME_LENGTH', FILENAME_LENGTH)
 app.config['MONGO_URI'] = os.environ.get("MONGO_CONN", MONGO_CONN)
+app.config['MAX_CONTENT_LENGTH'] = os.environ.get("MAX_FILESIZE")
 
 mongo = PyMongo(app)
 mongofs = GridFS(mongo.db)
